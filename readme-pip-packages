@@ -1,0 +1,94 @@
+
+
+python 3.8.2 windows 10 amd64
+
+
+(penv38) pip list
+Package                Version
+---------------------- -----------
+absl-py                0.9.0
+astunparse             1.6.3
+cachetools             4.1.0
+certifi                2020.6.20
+chardet                3.0.4
+future                 0.18.2
+gast                   0.3.3
+google-auth            1.18.0
+google-auth-oauthlib   0.4.1
+google-pasta           0.2.0
+grpcio                 1.30.0
+h5py                   2.10.0
+idna                   2.9
+Keras-Preprocessing    1.1.2
+Markdown               3.2.2
+numpy                  1.19.0
+oauthlib               3.1.0
+opt-einsum             3.2.1
+Pillow                 7.2.0
+pip                    19.2.3
+protobuf               3.12.2
+pyasn1                 0.4.8
+pyasn1-modules         0.2.8
+requests               2.24.0
+requests-oauthlib      1.3.0
+rsa                    4.6
+scipy                  1.4.1
+setuptools             41.2.0
+six                    1.15.0
+tensorboard            2.2.2
+tensorboard-plugin-wit 1.6.0.post3
+tensorflow             2.2.0
+tensorflow-estimator   2.2.0
+termcolor              1.1.0
+torch                  1.5.1+cpu
+torchvision            0.6.1+cpu
+urllib3                1.25.9
+Werkzeug               1.0.1
+wheel                  0.34.2
+wrapt                  1.12.1
+
+
+(penv38) pip install --upgrade tensorflow
+.../tensorflow-2.5.0-cp38-cp38-win_amd64.whl (422.6MB)
+
+Installing collected packages: numpy, h5py, wheel, absl-py, tensorboard-data-server, grpcio, tensorboard, opt-einsum, typing-extensions, flatbuffers, keras-nightly, gast, tensorflow-estimator, tensorflow
+  Found existing installation: numpy 1.19.0
+    Uninstalling numpy-1.19.0:
+      Successfully uninstalled numpy-1.19.0
+  Found existing installation: h5py 2.10.0
+    Uninstalling h5py-2.10.0:
+      Successfully uninstalled h5py-2.10.0
+  Found existing installation: wheel 0.34.2
+    Uninstalling wheel-0.34.2:
+      Successfully uninstalled wheel-0.34.2
+  Found existing installation: absl-py 0.9.0
+    Uninstalling absl-py-0.9.0:
+      Successfully uninstalled absl-py-0.9.0
+  Found existing installation: grpcio 1.30.0
+    Uninstalling grpcio-1.30.0:
+      Successfully uninstalled grpcio-1.30.0
+  Found existing installation: tensorboard 2.2.2
+    Uninstalling tensorboard-2.2.2:
+      Successfully uninstalled tensorboard-2.2.2
+  Found existing installation: opt-einsum 3.2.1
+    Uninstalling opt-einsum-3.2.1:
+      Successfully uninstalled opt-einsum-3.2.1
+  Found existing installation: gast 0.3.3
+    Uninstalling gast-0.3.3:
+      Successfully uninstalled gast-0.3.3
+  Found existing installation: tensorflow-estimator 2.2.0
+    Uninstalling tensorflow-estimator-2.2.0:
+      Successfully uninstalled tensorflow-estimator-2.2.0
+  Found existing installation: tensorflow 2.2.0
+    Uninstalling tensorflow-2.2.0:
+      Successfully uninstalled tensorflow-2.2.0
+Successfully installed absl-py-0.13.0 flatbuffers-1.12 gast-0.4.0 grpcio-1.34.1 h5py-3.1.0 keras-nightly-2.5.0.dev2021032900 numpy-1.19.5 opt-einsum-3.3.0 tensorboard-2.6.0 tensorboard-data-server-0.6.1 tensorflow-2.5.0 tensorflow-estimator-2.5.0 typing-extensions-3.7.4.3 wheel-0.36.2
+
+
+(penv38) pip install --upgrade Pillow
+...uninstall 7.2.0
+Successfully installed Pillow-8.3.1
+
+
+(penv38) pip list
+
