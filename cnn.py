@@ -57,6 +57,13 @@ if not loaded_ok:
     # Compiling the CNN
     classifier.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accuracy'])
 
+if loaded_ok:
+    epochs_to_run = 4
+else:
+    epochs_to_run = 25
+
+cfg_incremental_train = False # set to True to train smaller batches
+if cfg_incremental_train or not loaded_ok:
 
     # Part 2 - Fitting the CNN to the images
     # reference: https://keras.io/api/preprocessing/image/
@@ -83,7 +90,7 @@ if not loaded_ok:
     #classifier.fit_generator(training_set,
     classifier.fit(training_set,
                              steps_per_epoch = 448, ##8000,
-                             epochs = 25,
+                             epochs = epochs_to_run, ##25,
                              validation_data = test_set,
                              validation_steps = 16) ##2000)
 
@@ -99,6 +106,7 @@ if not loaded_ok:
     '''
 
     classifier.save("traied_model.h5")
+    classifier.save("./saved_model/1/") # https://towardsdatascience.com/how-to-use-a-saved-model-in-tensorflow-2-x-1fd76d491e69
 
     '''
     Found 8000 images belonging to 2 classes.
