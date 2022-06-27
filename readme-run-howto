@@ -1,0 +1,26 @@
+
+readme-run-howto
+
+toc
+    dataset
+    cnn training
+    cnn prediction
+
+
+dataset
+
+    Populate the "dataset/" directory so it contains "training_set/", "test_set/", "single_prediction/".
+    The "training_set/" contains "cats/" and "dogs/". Each of them contains 4001 jpg images.
+    The "test_set/", contains 1001 jpg images in its "cats/" and "dogs/" each.
+    The "single_prediction" contains two jpg images.
+
+
+cnn training
+
+    Remove the file "trained_model.h5", run "cnn.py", it will train and save a new model.
+
+
+cnn prediction
+
+    The prediction will use the newly trained model, or load a model from "trained_model.h5".
+

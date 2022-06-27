@@ -12,10 +12,10 @@
 import os
 
 loaded_ok = False
-if os.path.isfile("traied_model.h5"):
+if os.path.isfile("trained_model.h5"):
     from tensorflow.keras.models import load_model
     try:
-        tmp_classifier = load_model("traied_model.h5")
+        tmp_classifier = load_model("trained_model.h5")
         classifier = tmp_classifier
         print("Loaded full model")
         loaded_ok = True
@@ -23,6 +23,7 @@ if os.path.isfile("traied_model.h5"):
         pass
 
 if not loaded_ok:
+    print("Could not load \"trained_model.h5\"")
     print("Creating compiling and training a new model")
 
     # Part 1 - Building the CNN
@@ -65,6 +66,35 @@ else:
 cfg_incremental_train = False # set to True to train smaller batches
 if cfg_incremental_train or not loaded_ok:
 
+    def find_new_nidx():
+        file_prefix = "trained_model_"
+        file_suffix = ".h5"
+        fn_used, dn_used = 0, 0 # file number used, dir number used
+        files_list = [x for x in os.listdir("./") if os.path.isfile(x) and x.startswith(file_prefix)]
+        dirs_list = [x for x in os.listdir("./saved_model/") if os.path.isfile(x) and x.isdigit()]
+        files_list = sorted(files_list)
+        dirs_list = sorted(dirs_list)
+        if len(files_list) > 0:
+            last_fn_str = files_list[-1][len(file_prefix):]
+            if len(last_fn_str) > 0 and last_fn_str[0].isdigit():
+                sfx_idx = last_fn_str.find(file_suffix)
+                if sfx_idx > 0:
+                    last_fn_str = last_fn_str[:sfx_idx]
+                    last_fn = int(last_fn_str)
+                    if last_fn > 0:
+                        fn_used = last_fn
+        if len(dirs_list) > 0:
+            last_dn_str = dirs_list[-1]
+            if last_dn_str.isdigit():
+                last_dn = int(last_dn_str)
+                if last_dn > 0:
+                    dn_used = last_dn
+        return max(fn_used, dn_used) + 1
+    save_nidx_new = find_new_nidx()
+    save_file = "trained_model_%d.h5" % save_nidx_new
+    save_dir = "./saved_model/%d/" % save_nidx_new
+    print("Will save result to file \"%s\" and directory \"%s\"" % (save_file, save_dir))
+
     # Part 2 - Fitting the CNN to the images
     # reference: https://keras.io/api/preprocessing/image/
 
@@ -105,8 +135,10 @@ if cfg_incremental_train or not loaded_ok:
     WARNING:tensorflow:Your input ran out of data; interrupting training. Make sure that your dataset or generator can generate at least `steps_per_epoch * epochs` batches (in this case, 200000 batches). You may need to use the repeat() function when building your dataset.
     '''
 
-    classifier.save("traied_model.h5")
-    classifier.save("./saved_model/1/") # https://towardsdatascience.com/how-to-use-a-saved-model-in-tensorflow-2-x-1fd76d491e69
+    classifier.save(save_file)
+    classifier.save(save_dir) # https://towardsdatascience.com/how-to-use-a-saved-model-in-tensorflow-2-x-1fd76d491e69
+    print("Saved model to file \"%s\" directory \"%s\"" % (save_file, save_dir))
+    print("Please copy the file \"%s\" to \"%s\" to make use of it" % (save_file, "trained_model.h5"))
 
     '''
     Found 8000 images belonging to 2 classes.
@@ -122,6 +154,8 @@ if cfg_incremental_train or not loaded_ok:
     
     Epoch 25/25
     448/448 [==============================] - 25s 56ms/step - loss: 0.2239 - accuracy: 0.9061 - val_loss: 0.5894 - val_accuracy: 0.7812
+    WARNING:absl:Found untraced functions such as _jit_compiled_convolution_op, _jit_compiled_convolution_op while saving (showing 2 of 2). These functions will not be directly callable after loading.
+    --note 2022-6-27: the warning is from tf 2.9.1, not tf 2.5.0
     '''
 
 # Part 3 - Making new predictions
@@ -140,4 +174,5 @@ for idx in range(1,3):
     else:
         prediction = 'cat'
     print("Single prediction: ", idx, " is ", prediction)
+print("The two singles are: the first a dog, and the second a cat.")
 
