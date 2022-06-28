@@ -24,3 +24,8 @@ cnn prediction
 
     The prediction will use the newly trained model, or load a model from "trained_model.h5".
 
+
+save model architecture and weights
+
+    Populate the file "trained_model.h5", run "convert_model_to_json.py".
+

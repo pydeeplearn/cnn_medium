@@ -40,20 +40,27 @@ if not loaded_ok:
 
     # Step 1 - Convolution
     classifier.add(Conv2D(32, (3, 3), input_shape = (64, 64, 3), activation = 'relu'))
+    print("  output shape step 1:  ", repr(classifier.output_shape)) # (None, 62, 62, 32)
 
     # Step 2 - Pooling
     classifier.add(MaxPooling2D(pool_size = (2, 2)))
+    print("  output shape step 2: ", repr(classifier.output_shape)) # (None, 31, 31, 32)
 
-    # Adding a second convolutional layer
+    # Step 3 and 4 - Adding a second convolutional layer
     classifier.add(Conv2D(32, (3, 3), activation = 'relu'))
+    print("  output shape step 3: ", repr(classifier.output_shape)) # (None, 29, 29, 32)
     classifier.add(MaxPooling2D(pool_size = (2, 2)))
+    print("  output shape step 4: ", repr(classifier.output_shape)) # (None, 14, 14, 32)
 
-    # Step 3 - Flattening
+    # Step 5 - Flattening
     classifier.add(Flatten())
+    print("  output shape step 5: ", repr(classifier.output_shape)) # (None, 6272)
 
-    # Step 4 - Full connection
+    # Step 6 and 7 - Full connection
     classifier.add(Dense(units = 128, activation = 'relu'))
+    print("  output shape step 6: ", repr(classifier.output_shape)) # (None, 128)
     classifier.add(Dense(units = 1, activation = 'sigmoid'))
+    print("  output shape step 7: ", repr(classifier.output_shape)) # (None, 1)
 
     # Compiling the CNN
     classifier.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accuracy'])
