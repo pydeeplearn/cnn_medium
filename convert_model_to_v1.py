@@ -11,34 +11,74 @@
 import os
 
 
-loaded_ok = False
+classifier = None
+inferencer = None
+
+# attempt .h5
 if os.path.isfile("trained_model.h5"):
     from tensorflow.keras.models import load_model
     try:
         tmp_classifier = load_model("trained_model.h5")
         classifier = tmp_classifier
         print("Loaded full model from trained_model.h5")
-        loaded_ok = True
-    except:
+    except Exception as e:
+        print("Exception loading \"trained_model.h5\": ", repr(e))
         pass
 
-if not loaded_ok:
-    print("Could not load \"trained_model.h5\"")
-    if os.path.isdir("trained_model"):
+# attempt saved_model
+if classifier is None:
+    if os.path.isdir("trained_model") and os.path.isdir("trained_model/variables"):
         # it needs "saved_model.pb" and "variables/" under "trained_model"
         from tensorflow.keras.models import load_model
         try:
             tmp_classifier = load_model("trained_model")
             classifier = tmp_classifier
             print("Loaded full model from trained_model/")
-            loaded_ok = True
         except Exception as e:
-            print("Exception: ", repr(e))
+            print("Exception loading \"trained_model/\": ", repr(e))
             pass
 
-if not loaded_ok:
-    print("Could not load \"trained_model.h5\" or \"trained_model/\"")
-else:
+# attempt frozen_models/frozen_graph.pb
+if classifier is None:
+    # ref6:
+    # https://github.com/leimao/Frozen-Graph-TensorFlow/blob/master/TensorFlow_v2/example_1.py
+
+    import tensorflow as tf
+
+    def wrap_frozen_graph(graph_def, inputs, outputs, print_graph=False):
+        def _imports_graph_def():
+            tf.compat.v1.import_graph_def(graph_def, name="")
+
+        wrapped_import = tf.compat.v1.wrap_function(_imports_graph_def, [])
+        import_graph = wrapped_import.graph
+
+        if print_graph == True:
+            print("-" * 50)
+            print("Frozen model layers: ")
+            layers = [op.name for op in import_graph.get_operations()]
+            for layer in layers:
+                print(layer)
+            print("-" * 50)
+
+        return wrapped_import.prune(
+            tf.nest.map_structure(import_graph.as_graph_element, inputs),
+            tf.nest.map_structure(import_graph.as_graph_element, outputs))
+
+    # Load frozen graph using TensorFlow 1.x functions
+    if os.path.isdir("frozen_models") and os.path.isfile("frozen_models/frozen_graph.pb"):
+        with tf.io.gfile.GFile("./frozen_models/frozen_graph.pb", "rb") as f:
+            graph_def = tf.compat.v1.GraphDef()
+            loaded = graph_def.ParseFromString(f.read())
+
+    # Wrap frozen graph to ConcreteFunctions
+    frozen_func = wrap_frozen_graph(graph_def=graph_def,
+                                    inputs=["x:0"],
+                                    outputs=["Identity:0"],
+                                    print_graph=True)
+    inferencer = frozen_func
+
+
+if classifier is not None:
     print("Converting the model to json and h5")
 
     # serialize model to JSON
@@ -102,6 +142,8 @@ else:
     loaded_model.load_weights("model.h5")
     print("Loaded model from disk")
 
+
+if classifier is not None or inferencer is not None:
     # Part 3 - Making new predictions
     import numpy as np
     from tensorflow.keras.preprocessing import image
@@ -110,14 +152,27 @@ else:
         test_image = image.load_img('dataset/single_prediction/cat_or_dog_%d.jpg' % idx, target_size = (64, 64))
         test_image = image.img_to_array(test_image)
         test_image = np.expand_dims(test_image, axis = 0)
-        result = classifier.predict(test_image)
-        ##training_set.class_indices
-        if result[0][0] == 1:
-            prediction = 'dog'
+
+        if classifier is not None:
+            result = classifier.predict(test_image)
+            ##training_set.class_indices
+            if result[0][0] == 1:
+                prediction = 'dog'
+            else:
+                prediction = 'cat'
+            print("Single prediction: ", idx, " is ", prediction)
         else:
-            prediction = 'cat'
-        print("Single prediction: ", idx, " is ", prediction)
+            result = inferencer(x=tf.constant(test_image))
+            if result[0][0] == 1:
+                prediction = 'dog'
+            else:
+                prediction = 'cat'
+            print("Single prediction: ", idx, " is ", repr(result), "  a ", prediction)
     print("The two singles are: the first a dog, and the second a cat.")
+
+
+if classifier is not None and inferencer is not None:
+    # impossible. keep the code ahd revisit later.
 
     # Part 4 - More experiments
     # ref https://keras.io/getting_started/faq/#how-can-i-obtain-the-output-of-an-intermediate-layer-feature-extraction
@@ -158,6 +213,8 @@ else:
             prediction = 'cat'
         print("Single prediction: ", idx, " is ", prediction)
 
+
+if classifier is not None:
     # save to single pb file: ref4
     # https://stackoverflow.com/questions/58119155/freezing-graph-to-pb-in-tensorflow2
     import tensorflow as tf
