@@ -17,13 +17,26 @@ if os.path.isfile("trained_model.h5"):
     try:
         tmp_classifier = load_model("trained_model.h5")
         classifier = tmp_classifier
-        print("Loaded full model")
+        print("Loaded full model from trained_model.h5")
         loaded_ok = True
     except:
         pass
 
 if not loaded_ok:
     print("Could not load \"trained_model.h5\"")
+    if os.path.isdir("trained_model") and os.path.isdir("trained_model/variables"):
+        # it needs "saved_model.pb" and "variables/" under "trained_model"
+        from tensorflow.keras.models import load_model
+        try:
+            tmp_classifier = load_model("trained_model")
+            classifier = tmp_classifier
+            print("Loaded full model from trained_model/")
+            loaded_ok = True
+        except Exception as e:
+            pass
+
+if not loaded_ok:
+    print("Could not load \"trained_model.h5\" or \"trained_model/\"")
 else:
     print("Converting the model to json and h5")
 

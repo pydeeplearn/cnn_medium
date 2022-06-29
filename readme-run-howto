@@ -22,10 +22,13 @@ cnn training
 
 cnn prediction
 
-    The prediction will use the newly trained model, or load a model from "trained_model.h5".
+    The prediction will use the newly trained model,
+    or load a model from "trained_model.h5",
+    or load from "trained_model/saved_model.pb" and "trained_model/variables/".
 
 
 save model architecture and weights
 
-    Populate the file "trained_model.h5", run "convert_model_to_json.py".
+    Populate the file "trained_model.h5", or the directory "trained_model/",
+    then run "convert_model_to_json.py".
 
